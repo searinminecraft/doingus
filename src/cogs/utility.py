@@ -30,7 +30,7 @@ def setup(client) -> commands.Cog:
 
         await ctx.send(embeds=[embed])
 
-    @commands.is_owner
+    @commands.is_owner()
     @utility.command('shutdown', 'Shutdown the bot.')
     async def shutdown(ctx: commands.CommandContext):
         await ctx.reply('Shutting down.')

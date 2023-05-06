@@ -20,7 +20,7 @@ client.add_extension('cogs.misc')
 client.add_extension('cogs.utility')
 client.add_extension('cogs.games')
 
-@commands.is_owner
+@commands.is_owner()
 @client.command('loadcog', 'Loads a cog.')
 async def loadcog(ctx: commands.CommandContext, cog: str = None):
     if cog is None:
@@ -29,7 +29,7 @@ async def loadcog(ctx: commands.CommandContext, cog: str = None):
     client.add_extension(f'cogs.{cog}')
     await ctx.reply(f'Successfully loaded cog {cog}')
 
-@commands.is_owner
+@commands.is_owner()
 @client.command('unloadcog', 'Unloads a cog.')
 async def unloadcog(ctx: commands.CommandContext, cog: str = None):
     if cog is None:
@@ -38,7 +38,7 @@ async def unloadcog(ctx: commands.CommandContext, cog: str = None):
     client.remove_extension(f'cogs.{cog}')
     await ctx.reply(f'Successfully unloaded cog {cog}')
 
-@commands.is_owner
+@commands.is_owner()
 @client.command('reloadcog', 'Loads a cog.')
 async def reloadcog(ctx: commands.CommandContext, cog: str = None):
     if cog is None:
