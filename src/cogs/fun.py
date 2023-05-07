@@ -2,6 +2,7 @@ import voltage
 from voltage.ext import commands
 import random
 import asyncio
+import subprocess
 
 def setup(client) -> commands.Cog:
     fun = commands.Cog(
@@ -90,5 +91,16 @@ def setup(client) -> commands.Cog:
         )
 
         await ctx.send(embeds=[embed])
-        
+       
+    @fun.command('blank', 'creates a blank message :trol:')
+    async def blankmessage(ctx: commands.CommandContext):
+        await ctx.send('\n')
+
+    @fun.command('eavesdrop', 'Someone could be doing something nasty!')
+    async def eavesdrop(ctx: commands.CommandContext):
+        random = subprocess.run(['sh', '-c', 'base64 /dev/urandom | head -c 25'], stdout=subprocess.PIPE).stdout.decode('utf-8')
+
+        msg = f"```\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n@    WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED!     @\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\nIT IS POSSIBLE THAT SOMEONE IS DOING SOMETHING NASTY!\nSomeone could be eavesdropping on you right now (man-in-the-middle attack)!\nIt is also possible that a host key has just been changed.\nThe fingerprint for the ED25519 key sent by the remote host is\nSHA256:{random}.\nPlease contact your system administrator.\nAdd correct host key in /home/doingus/.ssh/known_hosts to get rid of this message.\nOffending ED25519 key in /home/doingus/.ssh/known_hosts:69420\nHost key for 127.0.0.1 has changed and you have requested strict checking.\nHost key verification failed.\n```"
+
+        await ctx.send(msg)
     return fun
