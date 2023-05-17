@@ -22,10 +22,14 @@ def getServerData():
     data = retrieveServerData()
 
     if data.status_code == 200:
-        with open('servers.xml', 'wb') as f:
-            f.write(data.content)
+        return data.text
     else:
         return
+
+# Thanks DernisNW for giving the code for converting big ip addresses to readable ones.
+def bigip(x):
+    return '.'.join([str(y) for y in int.to_bytes(int(x), 4, 'big')])
+
 
 def setup(client) -> commands.Cog:
     stk = commands.Cog(
@@ -38,7 +42,8 @@ def setup(client) -> commands.Cog:
 
         result = ''
 
-        root = et.parse('/tmp/servers.xml').getroot()
+        data = getServerData()
+        root = et.fromstring(data.replace('\n', ''))
 
         for _ in root[0]:
 
@@ -48,25 +53,34 @@ def setup(client) -> commands.Cog:
                 maxplayers = _[0].get('max_players')
                 currplayers = _[0].get('current_players')
                 currai = _[0].get('current_ai')
+                password: int = int(_[0].get('password'))
+                ip: int = int(_[0].get('ip'))
+                id: int = int(_[0].get('id'))
+                port: int = int(_[0].get('port'))
                 players = []
+
+                formattedip = bigip(ip)
 
                 for player in _[1]:
                     players.append([player.get('country-code'), player.get('username'), int(float(player.get('time-played')))])
 
+
                 if not players == []:
 
-                    if currtrack == '':
-                        result += f'#### [{country}] | {servername} | {currplayers}/{maxplayers}:'
-                    else:
-                        result += f'#### [{country}] | {servername} | {currplayers}/{maxplayers} | {currtrack}:'
-
-                    result += '\n'
+                    result += f'**{"".join(chr(127397 + ord(k)) for k in country)} {servername} ({formattedip}:{port})**\n'
+                    result += f'**Server ID**: {id}\n'
+                    result += f'**Current Track**: {currtrack}\n'
+                    result += f'**Password Protected**: {"Yes" if password == 1 else "No"}\n'
+                    result += f'**Players: ({currplayers}/{maxplayers})**\n'
+                    result += '```\n'
 
                     for pesant in players:
-                        result += (f'##### [{pesant[0]}] {pesant[1]} (Played for {pesant[2]} minutes)\n')
+                        result += (f'{"".join(chr(127397 + ord(k)) for k in pesant[0])} {pesant[1]} (Played for {pesant[2]} minutes)\n')
 
                     if not (int(currplayers) - players.__len__() <= 0):
-                        result += (f'###### +{int(currplayers) - players.__len__()}')
+                        result += (f'+{int(currplayers) - players.__len__()}\n')
+                    
+                    result += '```\n'
 
                     result += '\n'
 
@@ -76,6 +90,6 @@ def setup(client) -> commands.Cog:
             color = '#f5a9b8'
         )
 
-        await ctx.send(embeds=[embed])
+        await ctx.send('\n', embeds=[embed])
 
     return stk

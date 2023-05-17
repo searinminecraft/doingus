@@ -3,6 +3,7 @@ from voltage.ext import commands
 import random
 import asyncio
 import subprocess
+import math
 
 def setup(client) -> commands.Cog:
     fun = commands.Cog(
@@ -35,26 +36,30 @@ def setup(client) -> commands.Cog:
         if user is None:
             await ctx.reply('Specify a person you want to hack!')
             return
-        
-        msg = await ctx.send(f'Starting to hack {user.name}...')
-        await asyncio.sleep(3)
-        await msg.edit(f'Attempting to gain root access...')
-        await asyncio.sleep(5)
-        await msg.edit('Got root access! Getting sensitive information...')
-        await asyncio.sleep(3)
-        await msg.edit('Analyzing for illegal stuff...')
-        await asyncio.sleep(5)
-        await msg.edit(f'Reporting {user.name} to contact@revolt.chat for violating the AUP...')
-        await asyncio.sleep(2)
-        await msg.edit(f'Destroying {user.name}\'s computer using `rm -rf / --no-preserve-root`...')
-        await asyncio.sleep(6)
-        await msg.edit(f'Done hacking {user.name}!')
+        try:
+            msg = await ctx.send(f'Starting to hack **{user.name}**...')
+            await asyncio.sleep(3)
+            await msg.edit(f'Attempting to gain root access...')
+            await asyncio.sleep(5)
+            await msg.edit('Got root access! Getting sensitive information...')
+            await asyncio.sleep(3)
+            await msg.edit('Analyzing for illegal stuff...')
+            await asyncio.sleep(5)
+            await msg.edit(f'Reporting **{user.name}** to contact@revolt.chat for violating the AUP...')
+            await asyncio.sleep(2)
+            await msg.edit(f'Destroying **{user.name}**\'s computer using `rm -rf / --no-preserve-root`...')
+            await asyncio.sleep(6)
+            await msg.edit(f'Done hacking **{user.name}**!')
 
-        await msg.reply('The _totally real_ and dangerous hack is complete.')
+            await msg.reply('The _totally real_ and dangerous hack is complete.')
+        except:
+            await ctx.send(f'ok the hacking stopped because someone deleted my message while i was hacking **{user.name}**. rude.')
 
     @fun.command('8ball', 'Ask the Magic 8 Ball!')
-    async def eightball(ctx: commands.CommandContext, question: str = None):
+    async def eightball(ctx: commands.CommandContext, *, question):
         
+        print(question)
+
         if question is None:
             await ctx.reply('Please ask a question!')
             return
@@ -103,4 +108,14 @@ def setup(client) -> commands.Cog:
         msg = f"```\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n@    WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED!     @\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\nIT IS POSSIBLE THAT SOMEONE IS DOING SOMETHING NASTY!\nSomeone could be eavesdropping on you right now (man-in-the-middle attack)!\nIt is also possible that a host key has just been changed.\nThe fingerprint for the ED25519 key sent by the remote host is\nSHA256:{random}.\nPlease contact your system administrator.\nAdd correct host key in /home/doingus/.ssh/known_hosts to get rid of this message.\nOffending ED25519 key in /home/doingus/.ssh/known_hosts:69420\nHost key for 127.0.0.1 has changed and you have requested strict checking.\nHost key verification failed.\n```"
 
         await ctx.send(msg)
+
+    @fun.command('susrate', 'how sus are u? :amogus:')
+    async def susrate(ctx: commands.CommandContext, member: voltage.Member = None):
+        if member is None:
+            member = ctx.author
+        
+        await ctx.reply(f"{member.display_name} is **{random.randint(0, 100)}%** sus :amogus:")
+
+
+
     return fun

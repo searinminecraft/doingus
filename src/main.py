@@ -17,6 +17,7 @@ async def on_error(error:Exception, message:voltage.Message):
 
 client.add_extension('cogs.fun')
 client.add_extension('cogs.misc')
+client.add_extension('cogs.stk')
 client.add_extension('cogs.utility')
 client.add_extension('cogs.games')
 

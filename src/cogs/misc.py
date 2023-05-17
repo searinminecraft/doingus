@@ -33,12 +33,12 @@ def setup(client) -> commands.Cog:
         await ctx.reply(embeds=[embed])
 
     @misc.command()
-    async def echo(ctx: commands.CommandContext, msg: str='UwU'):
+    async def echo(ctx: commands.CommandContext, *, msg: str='UwU'):
         """Make doingus send a message of your liking."""
         
-        if ctx.author.bot:
-            await ctx.reply('Sorry, only real Revolt users can do this. Nice try!')
-            return
+        #if ctx.author.bot:
+        #    await ctx.reply('Sorry, only real Revolt users can do this. Nice try!')
+        #    return
 
         await ctx.send(msg)
     
