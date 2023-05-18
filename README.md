@@ -1,6 +1,6 @@
-# doingus
+<img align="right" src="assets/krash_catgirl_1.jpg" width="30%" height="30%" alt="Avatar hand drawn by me!">
 
-<img align="right" src="https://autumn.revolt.chat/avatars/NLpB-BNgWZAA915E14GnzCB2KW3n2wWtgIg19VgJQy/IMG_20230504_110523_1.jpg" width="30%" height="30%" alt="Avatar hand drawn by me!">
+# doingus
 
 doingus is a [Revolt](https://revolt.chat) bot that I made for fun. She's quite special, because she has feelings, unlike the other bots.
 
