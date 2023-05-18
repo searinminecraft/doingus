@@ -53,4 +53,20 @@ def setup(client) -> commands.Cog:
         except Exception:
             return await ctx.reply('Please reply to a message you want to owoify.')
 
+    @utility.command('roles', 'See a user\'s roles')
+    async def roles(ctx: commands.CommandContext, member: voltage.Member):
+        result = ''
+
+        for i in member.roles:
+            result += f'* {i}\n'
+
+        embed = voltage.SendableEmbed(
+            title = f'{member.name}\'s Roles:',
+            description = f'{result if result != "" else "This user does not have any roles!"}',
+            icon_url = member.avatar.url,
+            color = '#fa89b8'
+        )
+        
+        await ctx.reply(embed=embed)
+
     return utility

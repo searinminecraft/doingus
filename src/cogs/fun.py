@@ -116,6 +116,18 @@ def setup(client) -> commands.Cog:
         
         await ctx.reply(f"{member.display_name} is **{random.randint(0, 100)}%** sus :amogus:")
 
+    @fun.command('impersonate', 'impersonate someone!')
+    async def impersonate(ctx: commands.CommandContext, member: voltage.Member, *, message = 'UwU'):
 
+        rc = None
+
+        for role in member.roles:
+            if role.color is not None:
+                rc = role.color
+                break
+
+            rc = '#ffffff'
+
+        await ctx.send(message, masquerade=voltage.MessageMasquerade(member.name, member.avatar.url, color=rc))
 
     return fun

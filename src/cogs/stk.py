@@ -52,7 +52,6 @@ def setup(client) -> commands.Cog:
                 country = _[0].get('country_code')
                 maxplayers = _[0].get('max_players')
                 currplayers = _[0].get('current_players')
-                currai = _[0].get('current_ai')
                 password: int = int(_[0].get('password'))
                 ip: int = int(_[0].get('ip'))
                 id: int = int(_[0].get('id'))
@@ -63,7 +62,6 @@ def setup(client) -> commands.Cog:
 
                 for player in _[1]:
                     players.append([player.get('country-code'), player.get('username'), int(float(player.get('time-played')))])
-
 
                 if not players == []:
 
@@ -83,13 +81,53 @@ def setup(client) -> commands.Cog:
                     result += '```\n'
 
                     result += '\n'
-
+            
         embed = voltage.SendableEmbed(
             title = 'Online right now in STK',
-            description = result,
+            description = (result if result != '' else 'Uh, it appears that nobody is online... Have this instead: OwO'),
             color = '#f5a9b8'
         )
 
-        await ctx.send('\n', embeds=[embed])
+        await ctx.send(embeds=[embed])
 
+    @stk.command('stk-serversearch', 'Search for a server')
+    async def serversearch(ctx: commands.CommandContext, *, query: str):
+        root = et.fromstring(getServerData())
+        results = []
+        output = ''
+
+        for _ in root[0]:
+
+            if _[0].get('name').lower().find(query.lower()) >= 0:
+                results.append(_[0].attrib)
+
+        for result in results:
+            servername = result.get('name')
+            currtrack = result.get('current_track')
+            country = result.get('country_code')
+            maxplayers = result.get('max_players')
+            currplayers = result.get('current_players')
+            password: int = int(result.get('password'))
+            ip: int = int(result.get('ip'))
+            id: int = int(result.get('id'))
+            port: int = int(result.get('port'))
+
+            output += f'**{"".join(chr(127397 + ord(k)) for k in country)} {servername} ({bigip(ip)}:{port})**\n'
+            output += f'**Server ID**: {id}\n'
+            output += f'**Current Track**: {currtrack}\n'
+            output += f'**Password Protected**: {"Yes" if password == 1 else "No"}\n'
+            output += f'**Players**: {currplayers}/{maxplayers}\n'
+            output += '\n'
+
+        if len(output) > 2000:
+            return await ctx.send("Too many results.")
+
+        embed = voltage.SendableEmbed(
+            title = f'Search Results ({results.__len__()})',
+            description = output if output != '' else 'No results :(',
+            color = '#f5a9b8'
+        )
+
+        await ctx.send(embed=embed)
+    
     return stk
