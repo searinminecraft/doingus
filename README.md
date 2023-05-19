@@ -15,12 +15,16 @@ pip install -U python-dotenv
 pip install git+https://github.com/EnokiUN/voltage # since voltage from pypi is broken, use git version instead.
 ```
 
-Then you must configure the .env file. copy the `.env.example` file to `.env` and put in your Revolt bot token like so:
+Then you must configure the .env file. copy the `.env.example` file to `.env` and put in the following stuff:
 
 ```
-revolt_token='abcdefghijklmnopqrstuvwxyz12345'
-stk_username='krashy'
-stk_password='abcd1234'
+revolt_token='abcdefghijklmnopqrstuvwxyz12345' # Your Revolt bot's token
+
+# Optional, but SuperTuxKart features that require authentication won't work.
+# Create an account (that you shouldn't use for gameplay online) at https://online.supertuxkart.net/register.php
+
+stk_username='krashy' # SuperTuxKart username
+stk_password='abcd1234' # SuperTuxKart password
 ```
 
 Then you run it:
