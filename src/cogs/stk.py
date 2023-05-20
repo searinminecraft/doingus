@@ -2,6 +2,8 @@ import voltage
 from voltage.ext import commands
 import requests
 import xml.etree.ElementTree as et
+import subprocess
+from dotenv import load_dotenv, dotenv_values
 
 def retrieveServerData():
 
@@ -129,5 +131,59 @@ def setup(client) -> commands.Cog:
         )
 
         await ctx.send(embed=embed)
-    
+
+    @stk.command('top-ranked', 'See top ranked players.')
+    async def topranked(ctx: commands.CommandContext):
+        load_dotenv()
+        data = subprocess.run(['curl', '-sX', 'POST', '-d', f'userid={dotenv_values()["stk_userid"]}&token={dotenv_values()["stk_token"]}', 'https://online.supertuxkart.net/api/v2/user/top-players'], stdout=subprocess.PIPE).stdout.decode('utf-8')
+        root = et.fromstring(data)
+        output = ''
+        place = 1
+
+        for player in root[0].findall('player'):
+            output += f'{place}. **{player.get("username")}**: {player.get("scores")}\n'
+            place += 1
+
+        embed = voltage.SendableEmbed(
+            title = 'Top 10 ranked players',
+            description = output,
+            color = '#f5a9b8'
+        )
+
+        await ctx.send(embed=embed)
+
+    @stk.command('stk-usersearch', 'Search for a user.')
+    async def usersearch(ctx: commands.CommandContext, *, query: str):
+        load_dotenv()
+        data = subprocess.run(['curl', '-sX', 'POST', '-d', f'userid={dotenv_values()["stk_userid"]}&token={dotenv_values()["stk_token"]}&search-string={query.lower()}', 'https://online.supertuxkart.net/api/v2/user/user-search'], stdout=subprocess.PIPE).stdout.decode('utf-8')
+        root = et.fromstring(data)
+        output = ''
+
+        for _ in root[0].findall('user'):
+            output += f'* {_.get("user_name")} ({_.get("id")})\n'
+
+        if len(output) > 2000:
+            return await ctx.send('I couldn\'t fit all of it due to character limit.')
+
+        embed = voltage.SendableEmbed(
+            title = f'Search results for "{query}"',
+            description = output if output != '' else 'No results :(',
+            color = '#f5a9b8'
+        )
+
+        await ctx.send(embed=embed)
+
+    @stk.command('stkaccount', 'Know what STK account is being used!', ['stk-whoami'])
+    async def whoami(ctx: commands.CommandContext):
+        load_dotenv()
+
+        embed = voltage.SendableEmbed(
+            title = 'Who am I?',
+            description = f'Hi! I\'m {dotenv_values()["stk_username"]}! My User ID is {dotenv_values()["stk_userid"]}. OwO',
+            color = '#f5a9b8'
+        )
+
+        await ctx.send(embed=embed)
+
+       
     return stk

@@ -36,22 +36,6 @@ def setup(client) -> commands.Cog:
         await ctx.reply('Shutting down.')
         sys.exit(0)
 
-    @utility.command('owoify', 'Makes the message you reply to owo')
-    async def owoify(ctx: commands.CommandContext):
-        
-        try:
-            await ctx.send(str(
-            ctx.message.replies[0].content)
-                .replace('r', 'w')
-                .replace('R', 'W')
-                .replace('o', 'u')
-                .replace('O', 'U')
-                .replace('l', 'w')
-                .replace('L', 'W')
-            )
-            
-        except Exception:
-            return await ctx.reply('Please reply to a message you want to owoify.')
 
     @utility.command('roles', 'See a user\'s roles')
     async def roles(ctx: commands.CommandContext, member: voltage.Member):

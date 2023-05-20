@@ -2,6 +2,7 @@ import voltage
 from voltage.ext import commands
 import subprocess
 import random
+import asyncio
 import time
 
 def setup(client) -> commands.Cog:
@@ -25,8 +26,8 @@ def setup(client) -> commands.Cog:
     async def version(ctx: commands.CommandContext):
         """Version reporter"""
         embed = voltage.SendableEmbed(
-            title = 'Doingus',
-            description = f'Doingus is powered by Voltage. Version {voltage.__version__}',
+            title = 'doingus',
+            description = f'doingus is powered by Voltage. Version {voltage.__version__}',
             color = '#f5a9b8'
         )
 
@@ -65,6 +66,9 @@ def setup(client) -> commands.Cog:
     @misc.command('sourcecode')
     async def sourcecode(ctx: commands.CommandContext):
         await ctx.reply('i am not supposed to give a source code to you, sussy baka')
+        await asyncio.sleep(4)
+        await ctx.reply('anyways, here u go: https://github.com/searinminecraft/doingus')
+
 
     @misc.command()
     async def chrash(ctx: commands.CommandContext):
@@ -76,37 +80,5 @@ def setup(client) -> commands.Cog:
 
         await ctx.send(embeds=[embed])
     
-    @misc.command('why', 'Ask for doingus\'s opinion')
-    async def why(ctx: commands.CommandContext):
-        result = random.choice([
-            'Because the only way to fix your windows pc is rebooting.',
-            'because https://online.supertuxkart.net/api sucks',
-            'because searinminecraft is always accused of owning alt accounts from the philippines',
-            'because hollyleaf keeps beating me',
-            'because revolt is the best',
-            'because `sudo rm -rf / --no-preserve-root` solves everything',
-            'because `Session not valid. Please sign in`',
-            'because `no module found \'requests\'`',
-            'because nobody asked.',
-            'because aeasus',
-            'because supertuxkart authentication sucks',
-            'because i love insert, the creator of revolt',
-            'because i dont care about your opinion',
-            'because bluetooth tethering',
-            'because creating a stk server from stk leaks ur ip',
-            'because poland ranked is more like poland lagged',
-            'because kimden is sweet',
-            'because i love pineapple pizza',
-            'because searinminecraft drew my avatar',
-            'because None',
-            'because because because',
-            'because i use arch btw',
-            'because someone typed https://revolt.cat instead of revolt.chat',
-            'because kernel panic - not syncing: attempted to kill init! (exitcode=0x00000000)',
-            'because i know youre spamming this command',
-            'because automod'
-        ])
-
-        await ctx.send(result)
 
     return misc
