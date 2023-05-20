@@ -1,6 +1,7 @@
 import voltage
 from voltage.ext import commands
 import random
+import subprocess
 
 def setup(client) -> commands.Cog:
     text = commands.Cog(
