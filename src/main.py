@@ -9,8 +9,14 @@ import xml.etree.ElementTree as et
 
 load_dotenv()
 REVOLT_TOKEN = dotenv_values()['revolt_token']
-STK_USERNAME = dotenv_values()['stk_username']
-STK_PASSWORD = dotenv_values()['stk_password']
+STK_USERNAME = None
+STK_PASSWORD = None
+
+try:
+    STK_USERNAME = dotenv_values()['stk_username']
+    STK_PASSWORD = dotenv_values()['stk_password']
+except KeyError as k:
+    print(f'{k} was not provided. Disabling SuperTuxKart features.')
 
 class MyHelpCommand(commands.HelpCommand):
     async def send_help(self, ctx: commands.CommandContext):
@@ -96,25 +102,79 @@ async def stkAuth():
     print(f'Authenticating SuperTuxKart Account {STK_USERNAME}...')
     data = subprocess.run(['curl', '-sX', 'POST', '-d', f'username={STK_USERNAME}&password={STK_PASSWORD}&save_session=true', 'https://online.supertuxkart.net/api/v2/user/connect'], stdout=subprocess.PIPE).stdout.decode('utf-8')
     root = et.fromstring(data)
+    print(root.attrib)
     token = root.get('token')
+    userid = root.get('userid')
     
     if token is None:
         print(f'Failed to authenticate: {root.get("info")}')
         return
 
     set_key('.env', "stk_token", token)
+    set_key('.env', "stk_userid", userid)
 
+    load_dotenv()
+
+    print(f"""
+Successfully logged in as {STK_USERNAME}@stk!
+
+UserID: {userid}
+Token: {token}
+""")
+
+async def loop():
+    for i in range(1, 2147483647):
+        statuses = [
+            'OwO',
+			'Revolt >>>>>>>',
+			f'Making {len(client.members)} members smile',
+			'kimden is sweet',
+			'Watching you!',
+			'-help | https://github.com/searinminecraft/doingus',
+			f'Random number: {random.randint(1, 10000)}',
+			'I love you, and everyone!',
+			'aeasus',
+            'Simple, fast, systemd-free!',
+            'See online STK users with -online!',
+            f'Python Powered! Voltage {voltage.__version__}'
+		]
+		
+        status = random.choice(statuses)
+        print(f'Setting current status to {status}')
+        await client.set_status(status, voltage.PresenceType.online)
+
+        if STK_PASSWORD is not None and STK_USERNAME is not None:
+            print(f'Polling STK Account..')
+            data = subprocess.run(['curl', '-sX', 'POST', '-d', f'userid={dotenv_values()["stk_userid"]}&token={dotenv_values()["stk_token"]}', 'https://online.supertuxkart.net/api/v2/user/poll'], stdout=subprocess.PIPE).stdout.decode('utf-8')
+            root = et.fromstring(data)
+
+            if root.get('success') == 'no':
+                print(f'Poll request failed: {root.get("info")}. Attempting to reauthenticate.')
+                await stkAuth()
+
+        await asyncio.sleep(120)
 
 @client.listen('ready')
 async def on_ready():
-    await stkAuth()
-    await status()
+    if STK_PASSWORD is not None and STK_USERNAME is not None:
+        print('Start authenticating stk')
+        await stkAuth()
 
+    print('Start loop')
+    await loop()
+
+print('Loading Cogs...')
 client.add_extension('cogs.fun')
 client.add_extension('cogs.misc')
-client.add_extension('cogs.stk')
+if STK_PASSWORD is not None and STK_USERNAME is not None:
+    client.add_extension('cogs.stk')
+client.add_extension('cogs.mc')
+client.add_extension('cogs.text')
+client.add_extension('cogs.image')
 client.add_extension('cogs.utility')
 client.add_extension('cogs.games')
+print('Successfully Loaded Cogs.')
+
 @commands.is_owner()
 @client.command('loadcog', 'Loads a cog.')
 async def loadcog(ctx: commands.CommandContext, cog: str = None):
