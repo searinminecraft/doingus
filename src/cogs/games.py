@@ -1,6 +1,8 @@
 import voltage
+import math
 from voltage.ext import commands
 import random
+import asyncio
 
 class TickTackToeGame:
     """A simple class which represents and handles a game of tick tack toe"""

@@ -26,9 +26,10 @@ def setup(client) -> commands.Cog:
     async def version(ctx: commands.CommandContext):
         """Version reporter"""
         embed = voltage.SendableEmbed(
-            title = 'doingus',
-            description = f'doingus is powered by Voltage. Version {voltage.__version__}',
-            color = '#f5a9b8'
+            title = client.user.name,
+            description = f'{client.user.name} is powered by Voltage. Version {voltage.__version__}',
+            color = '#f5a9b8',
+            icon_url = client.user.avatar.url if client.user.avatar else client.user.default_avatar.url
         )
 
         await ctx.reply(embeds=[embed])
@@ -42,6 +43,13 @@ def setup(client) -> commands.Cog:
         #    return
 
         await ctx.send(msg)
+
+    @misc.command('embedecho', 'Same as `echo`, but sends it in an embed.')
+    async def embedecho(ctx: commands.CommandContext, *, msg: str = 'UwU'):
+        await ctx.send(embed=voltage.SendableEmbed(
+            description = msg,
+            color = '#f5a9b8'
+        ))
     
     @misc.command('neofetch', 'Outputs the neofetch of where the bot is running.', ['btw'])
     async def neofetch(ctx: commands.CommandContext):
@@ -49,7 +57,9 @@ def setup(client) -> commands.Cog:
 
         embed = voltage.SendableEmbed(
             title = 'neofetch',
-            description = f'```\n{output}\n```',
+            description = f"""```
+{output}
+```""",
             color = '#f5a9b8'
         )
 

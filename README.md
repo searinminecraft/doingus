@@ -19,6 +19,7 @@ Then you must configure the .env file. copy the `.env.example` file to `.env` an
 
 ```
 revolt_token='abcdefghijklmnopqrstuvwxyz12345' # Your Revolt bot's token
+prefix='owo!' # You can change it to anything you want.
 
 # Optional, but SuperTuxKart features that require authentication won't work.
 # Create an account (that you shouldn't use for gameplay online) at https://online.supertuxkart.net/register.php
@@ -33,4 +34,4 @@ Then you run it:
 python src/main.py
 ```
 
-The default prefix is `-`.
+The default prefix is `owo!`.

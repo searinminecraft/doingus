@@ -38,7 +38,7 @@ def setup(client) -> commands.Cog:
         name = 'SuperTuxKart',
         description = 'SuperTuxKart related stuff.'
     )
-    
+
     @stk.command('online', 'See online users.')
     async def stkonline(ctx: commands.CommandContext):
 

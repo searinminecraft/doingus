@@ -3,6 +3,8 @@ from voltage.ext import commands
 import aiohttp
 import random
 
+headers = {'User-Agent': 'Mozilla/5.0 (compatible; doingus/1.0.0; +https://github.com/searinminecraft/doingus)'}
+
 def setup(client) -> commands.Cog:
     image = commands.Cog(
         name = 'Image',
@@ -54,7 +56,7 @@ def setup(client) -> commands.Cog:
                 description = f"""That's not a valid category!! Possible categories are:
 
 ```
-{categories}
+{', '.join(categories)}
 ```""",
                 color = '#f5a9b8'
             )
@@ -62,16 +64,34 @@ def setup(client) -> commands.Cog:
             return await ctx.send(embed=embed)
 
         if category == 'randomcategory':
-            selected = random.choice(categories if type == 'sfw' else categoriesnsfw)
+            selected = random.choice(categories)
+            await ctx.send(f'**Category: {selected}**')
 
-        data: dict = None
-
-        async with aiohttp.ClientSession() as session:
+        async with aiohttp.ClientSession(headers=headers) as session:
             async with session.get(f'https://api.waifu.pics/sfw/{selected}') as resp:
                 data = await resp.json()
 
 
         await ctx.send(f'![]({data.get("url")})')
 
+    @image.command('nwaifu', 'Same as `waifu`, but NSFW.')
+    async def nwaifu(ctx: commands.CommandContext):
+        if isinstance(ctx.channel, voltage.DMChannel):  # Allow DM channels, because nobody will see them anyway
+            pass
+        elif ctx.channel.nsfw:
+            pass
+        else:
+            return await ctx.reply(embed=voltage.SendableEmbed(
+                title = 'Not so fast!',
+                description = 'This channel is not NSFW.',
+                color = '#f5a9b8'
+            ))
+
+        async with aiohttp.ClientSession(headers=headers) as session:
+            async with session.get(f'https://api.waifu.pics/nsfw/waifu') as resp:
+                data = await resp.json()
+
+
+        await ctx.send(f'![]({data.get("url")})')
 
     return image
