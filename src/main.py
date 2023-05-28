@@ -3,7 +3,9 @@ from dotenv import load_dotenv, dotenv_values, set_key
 from utils.log import log, color
 from voltage.ext import commands
 import random
+import json
 import asyncio
+import os
 import aiohttp
 import subprocess
 import xml.etree.ElementTree as et
@@ -95,7 +97,7 @@ async def on_error(error:Exception, message:voltage.Message):
     )
 
     await message.reply(embeds=[embed])
-    
+
 async def stkAuth():
     log('STK', f'Authenticating SuperTuxKart Account "{STK_USERNAME}"...', color.RED)
     data = subprocess.run(['curl', '-sX', 'POST', '-d', f'username={STK_USERNAME}&password={STK_PASSWORD}&save_session=true', 'https://online.supertuxkart.net/api/v2/user/connect'], stdout=subprocess.PIPE).stdout.decode('utf-8')
@@ -115,6 +117,38 @@ async def stkAuth():
     load_dotenv()
 
     log('STK', f'Successfully logged in as {STK_USERNAME}@stk!', color.GREEN)
+
+async def updateaddondb():
+    async with aiohttp.ClientSession() as session:
+        async with session.get('https://online.supertuxkart.net/downloads/xml/online_assets.xml') as resp:
+            log('PokeMap', 'Downloading latest addon database.')
+            db = et.fromstring(await resp.text('utf-8'))
+    lis = {}
+    
+
+    if not os.path.exists('data/addons.json'):
+        f = open('data/addons.json', 'w')
+        f.close()
+        for i in db.findall('track'):
+            
+            if int(i.get('status')) & 0x100:
+                lis[i.get('id')] = {**dict(i.attrib)}
+                log('PokeMap', f'Registered {i.get("id")} to database.', color.BLUE)
+            
+        with open('data/addons.json', 'w') as f:
+            json.dump(lis, f, indent=2)
+
+    database = json.load(open('data/addons.json'))
+
+    for i in db.findall('track'):
+        if i.get('id') not in database:            
+            if int(i.get('status')) & 0x100:
+                lis[i.get('id')] = {**dict(i.attrib)}
+                log('PokeMap', f'Registered {i.get("id")} to database.', color.BLUE)
+
+
+
+    
 
 async def loop():
     for i in range(1, 2147483647):
@@ -244,6 +278,7 @@ async def on_ready():
     client.add_extension('cogs.games')
     log('Cogs', 'Successfully Loaded Cogs.', color.RED)
 
+    await updateaddondb()
     if STK_PASSWORD and STK_USERNAME:
         log('STK', 'Start authenticating stk', color.BLUE)
         await stkAuth()

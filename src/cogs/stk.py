@@ -2,8 +2,13 @@ import voltage
 from voltage.ext import commands
 import requests
 import xml.etree.ElementTree as et
+import time
 import subprocess
+import random
+import math
+import os
 from dotenv import load_dotenv, dotenv_values
+import json
 
 def retrieveServerData():
 
@@ -185,5 +190,45 @@ def setup(client) -> commands.Cog:
 
         await ctx.send(embed=embed)
 
+    @stk.command('pokemap')
+    async def pokemap(ctx: commands.CommandContext):
+        if not(os.path.exists('data/pokemap.json')):
+            f = open('data/pokemap.json', 'w')
+            f.close()
+
+        with open('data/pokemap.json', 'r') as f:
+            data = json.load(f)
+
+        if ctx.author.id not in data:
+            data[ctx.author.id] = {'cooldown': 0, 'maps': []}
+            with open('data/pokemap.json', 'w') as f:
+                json.dump(data, f, indent = 2)
+            return await ctx.reply('You have been added to the database. Please re-execute the command!')
+
+        if not data[ctx.author.id]['cooldown'] > time.time():
+            with open('data/addons.json', 'r') as f:
+                addons = json.load(f)
+
+            addonCaught = random.choice(list(addons))
+
+            data[ctx.author.id]['cooldown'] = time.time() + 7200
+            data[ctx.author.id]['maps'].append(addonCaught)
+
+            await ctx.send(embed=voltage.SendableEmbed(
+                title = 'PokeMap',
+                description = f"""<@{ctx.author.id}>, you\'ve caught a {addons[addonCaught]["name"]}!
+                
+                `/installaddon {addonCaught}`""",
+                color = '#f5a9b8'
+            ))
+        else:
+            return await ctx.send(await ctx.send(embed=voltage.SendableEmbed(
+                title = 'PokeMap',
+                description = f"<@{ctx.author.id}>, the command is in cooldown. You can execute it again <t:{math.floor(data[ctx.author.id]['cooldown'])}:R>",
+                color = '#f5a9b8'
+            )))
+
+        with open('data/pokemap.json', 'w') as f:
+            json.dump(data, f, indent = 2)
        
     return stk
