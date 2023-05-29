@@ -222,11 +222,11 @@ def setup(client) -> commands.Cog:
                 color = '#f5a9b8'
             ))
         else:
-            return await ctx.send(await ctx.send(embed=voltage.SendableEmbed(
+            return await ctx.send(embed=voltage.SendableEmbed(
                 title = 'PokeMap',
                 description = f"<@{ctx.author.id}>, the command is in cooldown. You can execute it again <t:{math.floor(data[ctx.author.id]['cooldown'])}:R>",
                 color = '#f5a9b8'
-            )))
+            ))
 
         with open('data/pokemap.json', 'w') as f:
             json.dump(data, f, indent = 2)
