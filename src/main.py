@@ -13,14 +13,6 @@ import xml.etree.ElementTree as et
 load_dotenv()
 REVOLT_TOKEN = dotenv_values()['revolt_token']
 PREFIX = dotenv_values()['prefix']
-STK_USERNAME = None
-STK_PASSWORD = None
-
-try:
-    STK_USERNAME = dotenv_values()['stk_username']
-    STK_PASSWORD = dotenv_values()['stk_password']
-except KeyError as k:
-    print(f'{k} was not provided. Disabling SuperTuxKart features.')
 
 class MyHelpCommand(commands.HelpCommand):
     async def send_help(self, ctx: commands.CommandContext):
@@ -96,59 +88,7 @@ async def on_error(error:Exception, message:voltage.Message):
         color = '#f5a9b8'
     )
 
-    await message.reply(embeds=[embed])
-
-async def stkAuth():
-    log('STK', f'Authenticating SuperTuxKart Account "{STK_USERNAME}"...', color.RED)
-    data = subprocess.run(['curl', '-sX', 'POST', '-d', f'username={STK_USERNAME}&password={STK_PASSWORD}&save_session=true', 'https://online.supertuxkart.net/api/v2/user/connect'], stdout=subprocess.PIPE).stdout.decode('utf-8')
-    root = et.fromstring(data)
-    success = root.get('success')
-    token = root.get('token')
-    userid = root.get('userid')
-    
-    if success == 'no':
-        log('STK', f'Failed to authenticate STK Account "{STK_USERNAME}": {root.get("info")}. Disabling STK Cog.', color.RED)
-        client.remove_extension('cogs.stk')
-        return
-
-    set_key('.env', "stk_token", token)
-    set_key('.env', "stk_userid", userid)
-
-    load_dotenv()
-
-    log('STK', f'Successfully logged in as {STK_USERNAME}@stk!', color.GREEN)
-
-async def updateaddondb():
-    async with aiohttp.ClientSession() as session:
-        async with session.get('https://online.supertuxkart.net/downloads/xml/online_assets.xml') as resp:
-            log('PokeMap', 'Downloading latest addon database.')
-            db = et.fromstring(await resp.text('utf-8'))
-    lis = {}
-    
-
-    if not os.path.exists('data/addons.json'):
-        f = open('data/addons.json', 'w')
-        f.close()
-        for i in db.findall('track'):
-            
-            if int(i.get('status')) & 0x100:
-                lis[i.get('id')] = {**dict(i.attrib)}
-                log('PokeMap', f'Registered {i.get("id")} to database.', color.BLUE)
-            
-        with open('data/addons.json', 'w') as f:
-            json.dump(lis, f, indent=2)
-
-    database = json.load(open('data/addons.json'))
-
-    for i in db.findall('track'):
-        if i.get('id') not in database:            
-            if int(i.get('status')) & 0x100:
-                lis[i.get('id')] = {**dict(i.attrib)}
-                log('PokeMap', f'Registered {i.get("id")} to database.', color.BLUE)
-
-
-
-    
+    await message.reply(embeds=[embed])    
 
 async def loop():
     for i in range(1, 2147483647):
@@ -163,20 +103,11 @@ async def loop():
 			'I love you, and everyone!',
 			'aeasus',
             'Simple, fast, systemd-free!',
-            'See online STK users with -online!',
             f'Python Powered! Voltage {voltage.__version__}'
 		]
 		
         status = random.choice(statuses)
         await client.set_status(status, voltage.PresenceType.online)
-
-        if STK_PASSWORD and STK_USERNAME:
-            data = subprocess.run(['curl', '-sX', 'POST', '-d', f'userid={dotenv_values()["stk_userid"]}&token={dotenv_values()["stk_token"]}', 'https://online.supertuxkart.net/api/v2/user/poll'], stdout=subprocess.PIPE).stdout.decode('utf-8')
-            root = et.fromstring(data)
-
-            if root.get('success') == 'no':
-                log('STK', f'STK Poll request failed: {root.get("info")}. Attempting to reauthenticate.', color.RED)
-                await stkAuth()
 
         await asyncio.sleep(120)
 
@@ -269,8 +200,6 @@ async def on_ready():
     client.add_extension('cogs.owner')
     client.add_extension('cogs.fun')
     client.add_extension('cogs.misc')
-    if STK_PASSWORD and STK_USERNAME:
-        client.add_extension('cogs.stk')
     client.add_extension('cogs.mc')
     client.add_extension('cogs.text')
     client.add_extension('cogs.image')
@@ -278,11 +207,6 @@ async def on_ready():
     client.add_extension('cogs.games')
     log('Cogs', 'Successfully Loaded Cogs.', color.RED)
 
-    await updateaddondb()
-    if STK_PASSWORD and STK_USERNAME:
-        log('STK', 'Start authenticating stk', color.BLUE)
-        await stkAuth()
-
-    await loop()
+    asyncio.create_task(loop())
 
 client.run(REVOLT_TOKEN)
