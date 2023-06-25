@@ -1,8 +1,8 @@
-<img align="right" src="assets/krash_catgirl_1.jpg" width="30%" height="30%" alt="Avatar hand drawn by me!">
+<img align="right" src="assets/doingus.png" width="30%" height="30%" alt="Avatar hand drawn by me!">
 
 # doingus
 
-doingus is a [Revolt](https://revolt.chat) bot that I made for fun. She's quite special, because she has feelings, unlike the other bots.
+doingus is a [Revolt](https://revolt.chat) bot that I made for fun.
 
 I would also use this as a reference in case I forget how to code Revolt bots in Python.
 
